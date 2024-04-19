@@ -1,0 +1,24 @@
+﻿@model List<GeradorValores.Models.tbl_funcionarios>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Lista de Funcionários</h2>
+
+<table>
+    <tr>
+        <th>Nome</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.codigo</td>
+            <td>@item.nome</td>
+            <td>
+                @Html.ActionLink("Gerar Valores", "GerarValores", new { id = item.codigo })
+            </td>
+        </tr>
+    }
+</table>

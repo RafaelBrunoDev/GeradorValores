@@ -1,0 +1,87 @@
+﻿@model GeradorValores.Models.tbl_funcionarios
+
+@{
+    ViewBag.Title = "GerarValores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 style="margin-bottom: 30px;">Gerar Valores para @Model.nome</h2>
+
+<form action="@Url.Action("AdicionarValorHora")" method="post">
+    @Html.Hidden("IdFuncionario", Model.codigo)
+
+    <label for="Ano">Ano:</label>
+    <input name="Ano" required />
+
+    <label for="ValorHora" style="margin-left: 40px;">Valor Padrão:</label>
+    <input name="ValorHora" required />
+
+    <button type="submit">Adicionar Valor Hora</button>
+</form>
+
+<h3 style="margin-top: 50px;">Valores Cadastrados</h3>
+
+@if (Model.ValoresHora != null && Model.ValoresHora.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Valor/Hora</th>
+                <th>Ano</th>
+                <th>Mês</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var valor in Model.ValoresHora)
+            {
+                <tr>
+                    <td>
+                        <input type="text" class="form-control editavel" value="@valor.valor_hora" data-codigo="@valor.codigo" data-propriedade="valor_hora" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control editavel" value="@valor.ano" data-codigo="@valor.codigo" data-propriedade="ano" />
+                    </td>
+                    <td>
+                        @valor.mes
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-success salvar-valor" data-codigo="@valor.codigo">Salvar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".salvar-valor").click(function () {
+                var container = $(this).closest("tr");
+                var codigo = $(this).data("codigo");
+                var valorHora = container.find(".editavel[data-codigo='" + codigo + "'][data-propriedade='valor_hora']").val();
+                var ano = container.find(".editavel[data-codigo='" + codigo + "'][data-propriedade='ano']").val();
+
+                $.ajax({
+                    url: "@Url.Action("EditarValor")",
+                    method: "POST",
+                    data: { codigo: codigo, valorHora: valorHora, ano: ano },
+                    success: function (response) {
+                        if (response.success) {
+                            alert("Valores salvos com sucesso!");
+                        } else {
+                            alert("Erro ao salvar os valores: " + response.errorMessage);
+                        }
+                    },
+                    error: function () {
+                        alert("Erro ao salvar os valores.");
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
